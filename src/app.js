@@ -1,12 +1,13 @@
 const express = require("express");
-const { User } = require("./models");
+const authRoutes = require("./routes/authRoutes");
+const errorHandler = require("./middleware/errorHandler");
+const AppError = require("./utils/AppError");
 
 const app = express();
 
-// Basic middleware
 app.use(express.json());
 
-// Test route
+// Health check
 app.get("/health", (req, res) => {
   res.json({
     status: "success",
@@ -15,45 +16,15 @@ app.get("/health", (req, res) => {
   });
 });
 
-// TEST ROUTE - Create a user (we'll remove this later)
-app.post("/test/create-user", async (req, res) => {
-  try {
-    const user = await User.create({
-      email: req.body.email,
-      password: req.body.password,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      role: req.body.role || "customer",
-    });
+// API Routes
+app.use("/api/v1/auth", authRoutes);
 
-    res.status(201).json({
-      status: "success",
-      message: "User created successfully!",
-      data: user, // Password will be hidden by toJSON()
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: "error",
-      message: error.message,
-    });
-  }
+// Handle undefined routes
+app.use((req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
 
-// TEST ROUTE - Get all users
-app.get("/test/users", async (req, res) => {
-  try {
-    const users = await User.findAll();
-    res.json({
-      status: "success",
-      results: users.length,
-      data: users,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: error.message,
-    });
-  }
-});
+// Global error handler (must be last)
+app.use(errorHandler);
 
 module.exports = app;

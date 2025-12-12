@@ -8,7 +8,11 @@
     "dev": "nodemon server.js",
     "db:create": "node src/config/createDatabase.js"
   },
-  "keywords": ["inventory", "api", "nodejs"],
+  "keywords": [
+    "inventory",
+    "api",
+    "nodejs"
+  ],
   "author": "Isuru",
   "license": "ISC",
   "dependencies": {
