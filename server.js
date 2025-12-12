@@ -1,6 +1,7 @@
 require("dotenv").config();
 const app = require("./src/app");
 const { testConnection } = require("./src/config/database");
+const { syncDatabase } = require("./src/models");
 
 const PORT = process.env.PORT || 3000;
 
@@ -12,6 +13,8 @@ const startServer = async () => {
     if (!connected) {
       console.log("Server starting without database connection");
     }
+
+    await syncDatabase();
 
     // Start server
     app.listen(PORT, () => {
